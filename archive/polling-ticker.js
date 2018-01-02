@@ -1,3 +1,20 @@
+const Gdax = require('gdax');
+const publicClient = new Gdax.PublicClient();
+
+const PRODUCT_LIST = [
+  'BCH-USD',
+  'LTC-EUR',
+  'LTC-USD',
+  'LTC-BTC',
+  'ETH-EUR',
+  'ETH-USD',
+  'ETH-BTC',
+  'BTC-GBP',
+  'BTC-EUR',
+  'BTC-USD',
+]
+
+
 const chains = [
   {
     name: 'USD-BTC-ETH-USD',
@@ -23,19 +40,90 @@ const chains = [
     step_count: 3,
     commission: .0075,
   },
+  // {
+  //   name: 'USD-ETH-LTC-USD',
+  //   steps: [['USD', 'ETH'], ['ETH', 'LTC'], ['LTC', 'USD']],
+  //   step_count: 3,
+  //   commission: .0075,
+  // },
+  // {
+  //   name: 'USD-LTC-ETH-USD',
+  //   steps: [['USD', 'LTC'], ['LTC', 'ETH'], ['ETH', 'USD']],
+  //   step_count: 3,
+  //   commission: .0075,
+  // },
+  // {
+  //   name: 'USD-LTC-ETH-BTC-USD',
+  //   steps: [['USD', 'LTC'], ['LTC', 'ETH'], ['ETH', 'BTC'], ['BTC', 'USD']],
+  //   step_count: 4,
+  //   commission: .0100,
+  // },
   {
     name: 'USD-LTC-BTC-ETH-USD',
     steps: [['USD', 'LTC'], ['LTC', 'BTC'], ['BTC', 'ETH'], ['ETH', 'USD']],
     step_count: 4,
     commission: .0100,
   },
+  // {
+  //   name: 'USD-BTC-LTC-ETH-USD',
+  //   steps: [['USD', 'BTC'], ['BTC', 'LTC'], ['LTC', 'ETH'], ['ETH', 'USD']],
+  //   step_count: 4,
+  //   commission: .0100,
+  // },
+  // {
+  //   name: 'USD-BTC-ETH-LTC-USD',
+  //   steps: [['USD', 'BTC'], ['BTC', 'ETH'], ['ETH', 'LTC'], ['LTC', 'USD']],
+  //   step_count: 4,
+  //   commission: .0100,
+  // },
   {
     name: 'USD-ETH-BTC-LTC-USD',
     steps: [['USD', 'ETH'], ['ETH', 'BTC'], ['BTC', 'LTC'], ['LTC', 'USD']],
     step_count: 4,
     commission: .0100,
   },
-
+  // {
+  //   name: 'USD-ETH-LTC-BTC-USD',
+  //   steps: [['USD', 'ETH'], ['ETH', 'LTC'], ['LTC', 'BTC'], ['BTC', 'USD']],
+  //   step_count: 4,
+  //   commission: .0100,
+  // },
+  {
+    name: 'USD-ETH-EUR-LTC-USD',
+    steps: [['USD', 'ETH'], ['ETH', 'EUR'], ['EUR', 'LTC'], ['LTC', 'USD']],
+    step_count: 4,
+    commission: .0100,
+  },
+  {
+    name: 'USD-ETH-EUR-BTC-USD',
+    steps: [['USD', 'ETH'], ['ETH', 'EUR'], ['EUR', 'BTC'], ['BTC', 'USD']],
+    step_count: 4,
+    commission: .0100,
+  },
+  {
+    name: 'USD-BTC-EUR-LTC-USD',
+    steps: [['USD', 'BTC'], ['BTC', 'EUR'], ['EUR', 'LTC'], ['LTC', 'USD']],
+    step_count: 4,
+    commission: .0100,
+  },
+  {
+    name: 'USD-BTC-EUR-ETH-USD',
+    steps: [['USD', 'BTC'], ['BTC', 'EUR'], ['EUR', 'ETH'], ['ETH', 'USD']],
+    step_count: 4,
+    commission: .0100,
+  },
+  {
+    name: 'USD-LTC-EUR-BTC-USD',
+    steps: [['USD', 'LTC'], ['LTC', 'EUR'], ['EUR', 'BTC'], ['BTC', 'USD']],
+    step_count: 4,
+    commission: .0100,
+  },
+  {
+    name: 'USD-LTC-EUR-ETH-USD',
+    steps: [['USD', 'LTC'], ['LTC', 'EUR'], ['EUR', 'ETH'], ['ETH', 'USD']],
+    step_count: 4,
+    commission: .0100,
+  },
 
   // LTC
   {

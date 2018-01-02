@@ -16,6 +16,7 @@
   "author": "Nick Francisci",
   "license": "ISC",
   "dependencies": {
-    "gdax": "github:coinbase/gdax-node"
+    "gdax": "github:coinbase/gdax-node",
+    "num": "^0.3.0"
   }
 }
