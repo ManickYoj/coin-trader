@@ -1,0 +1,21 @@
+{
+  "name": "coin-trader",
+  "version": "0.0.1",
+  "description": "A quick foray into arbitrage",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "manickyoj",
+    "bitcoin",
+    "coin",
+    "cryptocurrency",
+    "arbitrage"
+  ],
+  "author": "Nick Francisci",
+  "license": "ISC",
+  "dependencies": {
+    "gdax": "github:coinbase/gdax-node"
+  }
+}
