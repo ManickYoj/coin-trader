@@ -1,7 +1,7 @@
 const num  = require('num');
 var fs = require('fs');
 
-const PROFITABILITY_THRESHOLD = 0.1
+const PROFITABILITY_THRESHOLD = 0.25
 
 function pad(number) {
   if (number < 10) return '0' + number
