@@ -5,10 +5,11 @@ const num  = require('num');
 
 // Extend the OrderbookSync class to trigger methods when it updates
 class PublishingOrderBook extends Gdax.OrderbookSync {
-  constructor() {
-    super();
+  constructor(product_board) {
+    super(Object.keys(product_board));
 
     this.subscribers = [];
+    this.product_board = product_board
   }
 
   subscribe(callback) {
@@ -22,13 +23,13 @@ class PublishingOrderBook extends Gdax.OrderbookSync {
     if (product_id === undefined) return;
 
     // Update the products list with the bet
-    products[product_id] = this.getProductData(product_id);
-    products[this.reverseProductID(product_id)] = this.reverseProductData(products[product_id])
+    this.product_board[product_id] = this.getProductData(product_id);
+    this.product_board[this.reverseProductID(product_id)] = this.reverseProductData(this.product_board[product_id])
 
     // Trigger any subscribers
     this.subscribers.forEach((callback) => {
-      callback(product_id, products)
-      callback(this.reverseProductID(product_id), products)
+      callback(product_id, this.product_board)
+      callback(this.reverseProductID(product_id), this.product_board)
     })
     // displayProductData()
   }
@@ -64,4 +65,4 @@ class PublishingOrderBook extends Gdax.OrderbookSync {
 }
 
 
-module.exports = TriggeringOrderBook;
+module.exports = PublishingOrderBook;
