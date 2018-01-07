@@ -1,6 +1,8 @@
 const num  = require('num');
 var fs = require('fs');
 
+const PROFITABILITY_THRESHOLD = 0.1
+
 function pad(number) {
   if (number < 10) return '0' + number
   else return number
@@ -55,6 +57,13 @@ class Chain {
     const ts = snapshot.timestamp
     fs.appendFile(
       `logs/${ts.getUTCFullYear()}-${pad(ts.getUTCMonth()+1)}-${pad(ts.getUTCDate())}.txt`,
+      this.toString(snapshot),
+    function (err) {
+      if (err) throw err;
+    });
+
+    if (snapshot.profitability > PROFITABILITY_THRESHOLD) fs.appendFile(
+      `logs/${ts.getUTCFullYear()}-${pad(ts.getUTCMonth()+1)}-${pad(ts.getUTCDate())}-highlights.txt`,
       this.toString(snapshot),
     function (err) {
       if (err) throw err;

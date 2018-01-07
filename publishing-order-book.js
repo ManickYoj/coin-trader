@@ -2,6 +2,7 @@
 
 const Gdax = require('gdax');
 const num  = require('num');
+const deepEqual  = require('fast-deep-equal');
 
 // Extend the OrderbookSync class to trigger methods when it updates
 class PublishingOrderBook extends Gdax.OrderbookSync {
@@ -21,10 +22,16 @@ class PublishingOrderBook extends Gdax.OrderbookSync {
 
     const { product_id } = data;
     if (product_id === undefined) return;
+    const reverse_product_id = this.reverseProductID(product_id)
+
+    const prev_values = Object.assign({}, this.product_board[product_id])
 
     // Update the products list with the bet
     this.product_board[product_id] = this.getProductData(product_id);
-    this.product_board[this.reverseProductID(product_id)] = this.reverseProductData(this.product_board[product_id])
+    this.product_board[reverse_product_id] = this.reverseProductData(this.product_board[product_id])
+
+    // Return early if no changes have been made to the best prices on the board
+    if (deepEqual(prev_values, this.product_board[product_id])) return
 
     // Trigger any subscribers
     this.subscribers.forEach((callback) => {
