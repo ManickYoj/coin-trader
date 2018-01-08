@@ -9,12 +9,13 @@ class PublishingOrderBook extends Gdax.OrderbookSync {
   constructor(product_board) {
     super(Object.keys(product_board));
 
-    this.subscribers = [];
+    this.subscribers = {};
     this.product_board = product_board
   }
 
-  subscribe(callback) {
-    this.subscribers.push(callback)
+  subscribe(product_id, callback) {
+    if (product_id in this.subscribers) this.subscribers[product_id].push(callback)
+    else this.subscribers[product_id] = [callback]
   }
 
   processMessage(data) {
@@ -34,11 +35,17 @@ class PublishingOrderBook extends Gdax.OrderbookSync {
     if (deepEqual(prev_values, this.product_board[product_id])) return
 
     // Trigger any subscribers
-    this.subscribers.forEach((callback) => {
-      callback(product_id, this.product_board)
-      callback(this.reverseProductID(product_id), this.product_board)
-    })
-    // displayProductData()
+    if (product_id in this.subscribers) {
+      this.subscribers[product_id].forEach(
+        callback => callback(this.product_board[product_id])
+      )
+    }
+
+    if (reverse_product_id in this.subscribers) {
+      this.subscribers[reverse_product_id].forEach(
+        callback => callback(this.product_board[reverse_product_id])
+      )
+    }
   }
 
   getProductData(product_id) {

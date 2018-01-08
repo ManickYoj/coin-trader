@@ -1,5 +1,18 @@
+// TODO: max_inputs at chain level seem impossibly low
+// It looks like it's taking the min of any conversion size
+// in the chain without executing the conversions.
+// Needs to be fixed.
+
+// TODO: Logging outputs junk ('[Object]'). Need decent
+// stringification and probably want to filter out the < 1.0 rates
+
 const PublishingOrderBook = require('./publishing-order-book')
+const Conversion = require('./conversion')
 const Chain = require('./chain')
+
+const fs = require('fs');
+
+const PROFITABILITY_THRESHOLD = 1.0025
 
 const product_board = {
   'BCH-USD': {},
@@ -94,10 +107,54 @@ const CHAIN_CONFIG = [
   },
 ]
 
-// Running code
+function pad(number) {
+  if (number < 10) return '0' + number
+  else return number
+}
+
+function standard_logger(order) {
+  const ts = order.timestamp
+  const dest = `logs/${ts.getUTCFullYear()}-${pad(ts.getUTCMonth()+1)}-${pad(ts.getUTCDate())}.txt`
+  log(dest, order)
+}
+
+function highlight_logger(order) {
+  if (order.rate > 1.0025) {
+    const ts = order.timestamp
+    const dest = `logs/${ts.getUTCFullYear()}-${pad(ts.getUTCMonth()+1)}-${pad(ts.getUTCDate())}-highlights.txt`
+    log(dest, order)
+  }
+}
+
+function log(dest, order) {
+  fs.appendFile(dest, order.toData(), err => { if (err) throw err });
+}
+
+// -- Running code
+console.log('Starting...')
+console.log('Creating order book...')
 const order_book = new PublishingOrderBook(product_board);
+
+console.log('Creating conversions...')
+const conversions = {}
+Object.keys(product_board).forEach(
+  conversion_name => {
+    const [from, to] = conversion_name.split('-')
+    conversions[`${from}-${to}`] = new Conversion(from, to, order_book)
+    conversions[`${to}-${from}`] = new Conversion(to, from, order_book)
+  }
+)
+
+console.log('Creating chains...')
 const chains = CHAIN_CONFIG.map(chain_data => {
-  const chain = new Chain(chain_data.steps)
-  order_book.subscribe((product_id, product_board) => {chain.update(product_id, product_board)})
-  return chain
+  return new Chain(chain_data.steps.map(step => conversions[step.join('-')]))
+})
+
+console.log('Setup complete. Beginning to process data.')
+
+// Order processing
+chains.forEach(chain => {
+  chain.subscribe(order => console.log(order))
+  chain.subscribe(order => standard_logger(order))
+  chain.subscribe(order => highlight_logger(order))
 })
