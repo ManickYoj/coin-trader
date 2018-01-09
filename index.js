@@ -115,11 +115,13 @@ function pad(number) {
 function standard_logger(order) {
   const ts = order.timestamp
   const dest = `logs/${ts.getUTCFullYear()}-${pad(ts.getUTCMonth()+1)}-${pad(ts.getUTCDate())}.txt`
-  log(dest, order)
+  if (order.rate > 1) {
+    log(dest, order)
+  }
 }
 
 function highlight_logger(order) {
-  if (order.rate > 1.0025) {
+  if (order.rate > PROFITABILITY_THRESHOLD) {
     const ts = order.timestamp
     const dest = `logs/${ts.getUTCFullYear()}-${pad(ts.getUTCMonth()+1)}-${pad(ts.getUTCDate())}-highlights.txt`
     log(dest, order)
@@ -127,7 +129,7 @@ function highlight_logger(order) {
 }
 
 function log(dest, order) {
-  fs.appendFile(dest, order.toData(), err => { if (err) throw err });
+  fs.appendFile(dest, JSON.stringify(order.toData()), err => { if (err) throw err });
 }
 
 // -- Running code
