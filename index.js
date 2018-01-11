@@ -1,18 +1,29 @@
-// TODO: max_inputs at chain level seem impossibly low
-// It looks like it's taking the min of any conversion size
-// in the chain without executing the conversions.
-// Needs to be fixed.
+// -- Library imports
+const bunyan = require('bunyan');
+const fs = require('fs');
 
-// TODO: Logging outputs junk ('[Object]'). Need decent
-// stringification and probably want to filter out the < 1.0 rates
-
+// -- File imports
 const PublishingOrderBook = require('./publishing-order-book')
 const Conversion = require('./conversion')
 const Chain = require('./chain')
 
-const fs = require('fs');
-
+// -- Constant definitions
 const PROFITABILITY_THRESHOLD = 1.0025
+const tradeLog = bunyan.createLogger({
+  name: "trade-log",
+  streams: [
+    {
+      level: 'info',
+      stream: process.stdout
+    },
+    {
+      type: 'rotating-file',
+      path: './logs/trade-log.log',
+      period: '1d',
+      count: 28,
+    },
+  ],
+})
 
 const product_board = {
   'BCH-USD': {},
@@ -25,18 +36,6 @@ const product_board = {
   // 'BTC-GBP': {},
   // 'BTC-EUR': {},
   'BTC-USD': {},
-}
-
-function displayProductData() {
-  console.log("UPDATE:  ")
-  Object.values(products).forEach(product => {
-    Object.entries(product).forEach(property => {
-      console.log(`${property[0]}: ${property[1].toString()}`)
-    })
-    console.log("--")
-  })
-  console.log("")
-  console.log("")
 }
 
 const CHAIN_CONFIG = [
@@ -107,30 +106,44 @@ const CHAIN_CONFIG = [
   },
 ]
 
-function pad(number) {
-  if (number < 10) return '0' + number
-  else return number
+
+// -- Utility functions
+function displayProductData() {
+  console.log("UPDATE:  ")
+  Object.values(products).forEach(product => {
+    Object.entries(product).forEach(property => {
+      console.log(`${property[0]}: ${property[1].toString()}`)
+    })
+    console.log("--")
+  })
+  console.log("")
+  console.log("")
 }
 
-function standard_logger(order) {
-  const ts = order.timestamp
-  const dest = `logs/${ts.getUTCFullYear()}-${pad(ts.getUTCMonth()+1)}-${pad(ts.getUTCDate())}.txt`
-  if (order.rate > 1) {
-    log(dest, order)
-  }
-}
+// function pad(number) {
+//   if (number < 10) return '0' + number
+//   else return number
+// }
 
-function highlight_logger(order) {
-  if (order.rate > PROFITABILITY_THRESHOLD) {
-    const ts = order.timestamp
-    const dest = `logs/${ts.getUTCFullYear()}-${pad(ts.getUTCMonth()+1)}-${pad(ts.getUTCDate())}-highlights.txt`
-    log(dest, order)
-  }
-}
+// function standard_logger(order) {
+//   const ts = order.timestamp
+//   const dest = `logs/${ts.getUTCFullYear()}-${pad(ts.getUTCMonth()+1)}-${pad(ts.getUTCDate())}.txt`
+//   if (order.rate > 1) {
+//     log(dest, order)
+//   }
+// }
 
-function log(dest, order) {
-  fs.appendFile(dest, JSON.stringify(order.toData()), err => { if (err) throw err });
-}
+// function highlight_logger(order) {
+//   if (order.rate > PROFITABILITY_THRESHOLD) {
+//     const ts = order.timestamp
+//     const dest = `logs/${ts.getUTCFullYear()}-${pad(ts.getUTCMonth()+1)}-${pad(ts.getUTCDate())}-highlights.txt`
+//     log(dest, order)
+//   }
+// }
+
+// function log(dest, order) {
+//   fs.appendFile(dest, JSON.stringify(order.toData()), err => { if (err) throw err });
+// }
 
 // -- Running code
 console.log('Starting...')
@@ -156,7 +169,5 @@ console.log('Setup complete. Beginning to process data.')
 
 // Order processing
 chains.forEach(chain => {
-  chain.subscribe(prediction => console.log(prediction))
-  chain.subscribe(prediction => standard_logger(prediction))
-  chain.subscribe(prediction => highlight_logger(prediction))
+  chain.subscribe(prediction => tradeLog.info(prediction))
 })

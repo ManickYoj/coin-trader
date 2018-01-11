@@ -4,6 +4,7 @@
   "description": "A quick foray into arbitrage",
   "main": "index.js",
   "scripts": {
+    "run": "node index.js | ./node_modules/.bin/bunyan",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -16,6 +17,7 @@
   "author": "Nick Francisci",
   "license": "ISC",
   "dependencies": {
+    "bunyan": "^1.8.12",
     "fast-deep-equal": "^1.0.0",
     "gdax": "github:coinbase/gdax-node",
     "num": "^0.3.0"
