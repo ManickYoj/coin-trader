@@ -1,5 +1,3 @@
-// TODO: Sanity check bid/ask prices. They don't always mean intuitive things.
-
 const Gdax = require('gdax');
 const num  = require('num');
 const deepEqual  = require('fast-deep-equal');
@@ -9,12 +7,13 @@ class PublishingOrderBook extends Gdax.OrderbookSync {
   constructor(product_board) {
     super(Object.keys(product_board));
 
-    this.subscribers = [];
+    this.subscribers = {};
     this.product_board = product_board
   }
 
-  subscribe(callback) {
-    this.subscribers.push(callback)
+  subscribe(product_id, callback) {
+    if (product_id in this.subscribers) this.subscribers[product_id].push(callback)
+    else this.subscribers[product_id] = [callback]
   }
 
   processMessage(data) {
@@ -34,11 +33,17 @@ class PublishingOrderBook extends Gdax.OrderbookSync {
     if (deepEqual(prev_values, this.product_board[product_id])) return
 
     // Trigger any subscribers
-    this.subscribers.forEach((callback) => {
-      callback(product_id, this.product_board)
-      callback(this.reverseProductID(product_id), this.product_board)
-    })
-    // displayProductData()
+    if (product_id in this.subscribers) {
+      this.subscribers[product_id].forEach(
+        callback => callback(this.product_board[product_id])
+      )
+    }
+
+    if (reverse_product_id in this.subscribers) {
+      this.subscribers[reverse_product_id].forEach(
+        callback => callback(this.product_board[reverse_product_id])
+      )
+    }
   }
 
   getProductData(product_id) {
@@ -46,13 +51,16 @@ class PublishingOrderBook extends Gdax.OrderbookSync {
     const best_bid = book._bids.max();
     const best_ask = book._asks.min();
 
-    return ({
-      product_id: product_id,
-      bid_price: best_bid.price,
-      bid_size: best_bid.orders.reduce((acc, o) => o.size.add(acc), num(0)),
-      ask_price: best_ask.price,
-      ask_size: best_ask.orders.reduce((acc, o) => o.size.add(acc), num(0)),
-    })
+
+    return (
+      {
+        product_id: product_id,
+        bid_price: best_bid.price,
+        bid_size: best_bid.orders.reduce((acc, o) => o.size.add(acc), num(0)),
+        ask_price: best_ask.price,
+        ask_size: best_ask.orders.reduce((acc, o) => o.size.add(acc), num(0)),
+      }
+    )
   }
 
   reverseProductID(product_id) {
@@ -64,9 +72,9 @@ class PublishingOrderBook extends Gdax.OrderbookSync {
     return ({
       product_id: this.reverseProductID(product_data.product_id),
       ask_price: (num('1.000000000000').div(product_data.bid_price)),
-      ask_size:  (num('1.000000000000').div(product_data.bid_size)),
+      ask_size:  product_data.bid_size * product_data.bid_price,
       bid_price: (num('1.000000000000').div(product_data.ask_price)),
-      bid_size:  (num('1.000000000000').div(product_data.ask_size)),
+      bid_size:  product_data.ask_size * product_data.ask_price,
     })
   }
 }
