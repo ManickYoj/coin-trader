@@ -16,6 +16,7 @@ class Conversion {
 
     this.rate = null
     this.max_input = null
+    this.max_output = null
 
     product_data_source.subscribe(this.name, (product_data) => this.update(product_data))
   }
@@ -32,12 +33,35 @@ class Conversion {
   update(product_data) {
     this.rate = parseFloat(product_data.ask_price.toString())
     this.max_input = parseFloat(product_data.ask_size.toString())
+    this.max_output = this.convert(this.max_input)
     this.listeners.forEach(listener => listener(this))
   }
 
   convert(amount) {
     if (!this.ready()) throw `Conversion ${this.name} not yet ready to calculate.`
     return (amount * this.rate) * (1-this.commission)
+  }
+
+  toData() {
+    const {
+      name,
+      from_cur,
+      to_cur,
+      rate,
+      max_input,
+      max_output,
+      commission,
+    } = this
+
+    return {
+      name,
+      from_cur,
+      to_cur,
+      rate,
+      max_input,
+      max_output,
+      commission,
+    }
   }
 }
 

@@ -156,7 +156,7 @@ console.log('Setup complete. Beginning to process data.')
 
 // Order processing
 chains.forEach(chain => {
-  chain.subscribe(order => console.log(order))
-  chain.subscribe(order => standard_logger(order))
-  chain.subscribe(order => highlight_logger(order))
+  chain.subscribe(prediction => console.log(prediction))
+  chain.subscribe(prediction => standard_logger(prediction))
+  chain.subscribe(prediction => highlight_logger(prediction))
 })

@@ -1,4 +1,4 @@
-class Order {
+class Prediction {
   constructor(chain, timestamp = new Date()) {
     this.name = `${chain.name} at ${timestamp}`
     this.timestamp = timestamp
@@ -9,6 +9,9 @@ class Order {
     this.rate = chain.rate
     this.max_input = chain.max_input
     this.max_output = this.calculate(this.max_input)
+    this.conversions = chain.conversions.map(
+      conversion => conversion.toData()
+    )
   }
 
   calculate(amount) {
@@ -16,18 +19,30 @@ class Order {
   }
 
   toData() {
+    const {
+      name,
+      timestamp,
+      rate,
+      max_input,
+      max_output,
+      from_cur,
+      to_cur,
+      conversions,
+    } = this
+
     return {
-      name: this.name,
-      timestamp: this.timestamp,
-      rate: this.rate,
-      max_input: this.max_input,
-      max_output: this.max_output,
-      from_cur: this.from_cur,
-      to_cur: this.to_cur,
+      name,
+      timestamp,
+      rate,
+      max_input,
+      max_output,
+      from_cur,
+      to_cur,
+      conversions,
     }
   }
 
   execute() {}
 }
 
-module.exports = Order
+module.exports = Prediction

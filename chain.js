@@ -1,4 +1,4 @@
-const Order = require('./order')
+const Prediction = require('./prediction')
 
 class Chain {
   constructor(conversions) {
@@ -38,13 +38,33 @@ class Chain {
 
     this.max_input = max_output / this.rate
 
-    // Spin-off order
-    const order = new Order(this)
-    this.listeners.forEach(listener => listener(order))
+    // Spin-off prediction
+    const prediction = new Prediction(this)
+    this.listeners.forEach(listener => listener(prediction))
   }
 
   subscribe(callback) {
     this.listeners.push(callback)
+  }
+
+  toData() {
+    const {
+      name,
+      from_cur,
+      to_cur,
+      rate,
+      max_input,
+      conversions,
+    } = this
+
+    return {
+      name,
+      from_cur,
+      to_cur,
+      rate,
+      max_input,
+      conversions: conversions.map(conversion => conversion.toData()),
+    }
   }
 }
 

@@ -1,5 +1,3 @@
-// TODO: Sanity check bid/ask prices. They don't always mean intuitive things.
-
 const Gdax = require('gdax');
 const num  = require('num');
 const deepEqual  = require('fast-deep-equal');
@@ -53,13 +51,16 @@ class PublishingOrderBook extends Gdax.OrderbookSync {
     const best_bid = book._bids.max();
     const best_ask = book._asks.min();
 
-    return ({
-      product_id: product_id,
-      bid_price: best_bid.price,
-      bid_size: best_bid.orders.reduce((acc, o) => o.size.add(acc), num(0)),
-      ask_price: best_ask.price,
-      ask_size: best_ask.orders.reduce((acc, o) => o.size.add(acc), num(0)),
-    })
+
+    return (
+      {
+        product_id: product_id,
+        bid_price: best_bid.price,
+        bid_size: best_bid.orders.reduce((acc, o) => o.size.add(acc), num(0)),
+        ask_price: best_ask.price,
+        ask_size: best_ask.orders.reduce((acc, o) => o.size.add(acc), num(0)),
+      }
+    )
   }
 
   reverseProductID(product_id) {
@@ -71,9 +72,9 @@ class PublishingOrderBook extends Gdax.OrderbookSync {
     return ({
       product_id: this.reverseProductID(product_data.product_id),
       ask_price: (num('1.000000000000').div(product_data.bid_price)),
-      ask_size:  (num('1.000000000000').div(product_data.bid_size)),
+      ask_size:  product_data.bid_size * product_data.bid_price,
       bid_price: (num('1.000000000000').div(product_data.ask_price)),
-      bid_size:  (num('1.000000000000').div(product_data.ask_size)),
+      bid_size:  product_data.ask_size * product_data.ask_price,
     })
   }
 }
