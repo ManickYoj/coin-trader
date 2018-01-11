@@ -4,7 +4,7 @@
   "description": "A quick foray into arbitrage",
   "main": "index.js",
   "scripts": {
-    "run": "node index.js | ./node_modules/.bin/bunyan",
+    "start": "node index.js | ./node_modules/.bin/bunyan",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

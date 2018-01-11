@@ -120,31 +120,6 @@ function displayProductData() {
   console.log("")
 }
 
-// function pad(number) {
-//   if (number < 10) return '0' + number
-//   else return number
-// }
-
-// function standard_logger(order) {
-//   const ts = order.timestamp
-//   const dest = `logs/${ts.getUTCFullYear()}-${pad(ts.getUTCMonth()+1)}-${pad(ts.getUTCDate())}.txt`
-//   if (order.rate > 1) {
-//     log(dest, order)
-//   }
-// }
-
-// function highlight_logger(order) {
-//   if (order.rate > PROFITABILITY_THRESHOLD) {
-//     const ts = order.timestamp
-//     const dest = `logs/${ts.getUTCFullYear()}-${pad(ts.getUTCMonth()+1)}-${pad(ts.getUTCDate())}-highlights.txt`
-//     log(dest, order)
-//   }
-// }
-
-// function log(dest, order) {
-//   fs.appendFile(dest, JSON.stringify(order.toData()), err => { if (err) throw err });
-// }
-
 // -- Running code
 console.log('Starting...')
 console.log('Creating order book...')
