@@ -1,9 +1,9 @@
-const Gdax = require('gdax');
+const gdax = require('gdax');
 const num  = require('num');
 const deepEqual  = require('fast-deep-equal');
 
 // Extend the OrderbookSync class to trigger methods when it updates
-class PublishingOrderBook extends Gdax.OrderbookSync {
+class PublishingOrderBook extends gdax.OrderbookSync {
   constructor(product_board) {
     super(Object.keys(product_board));
 

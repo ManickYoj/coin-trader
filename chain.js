@@ -43,6 +43,11 @@ class Chain {
     this.listeners.forEach(listener => listener(prediction))
   }
 
+  convert(amount) {
+    if (!this.rate) throw `Chain ${this.name} not yet ready to calculate.`
+    return amount * rate
+  }
+
   subscribe(callback) {
     this.listeners.push(callback)
   }

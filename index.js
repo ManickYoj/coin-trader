@@ -6,11 +6,11 @@ const fs = require('fs');
 const PublishingOrderBook = require('./publishing-order-book')
 const Conversion = require('./conversion')
 const Chain = require('./chain')
+const Purchaser = require('./purchaser')
 
 // -- Constant definitions
-const PROFITABILITY_THRESHOLD = 1.0025
-const tradeLog = bunyan.createLogger({
-  name: "trade-log",
+const marketLog = bunyan.createLogger({
+  name: "market-log",
   streams: [
     {
       level: 'info',
@@ -18,7 +18,7 @@ const tradeLog = bunyan.createLogger({
     },
     {
       type: 'rotating-file',
-      path: './logs/trade-log.log',
+      path: './logs/market-log.log',
       period: '1d',
       count: 28,
     },
@@ -75,7 +75,6 @@ const CHAIN_CONFIG = [
     step_count: 4,
     commission: .0100,
   },
-
 
   // LTC
   {
@@ -140,9 +139,13 @@ const chains = CHAIN_CONFIG.map(chain_data => {
   return new Chain(chain_data.steps.map(step => conversions[step.join('-')]))
 })
 
+console.log('Initializing purchasing module...')
+const purchaser = new Purchaser()
+
 console.log('Setup complete. Beginning to process data.')
 
 // Order processing
 chains.forEach(chain => {
-  chain.subscribe(prediction => tradeLog.info(prediction))
+  chain.subscribe(prediction => marketLog.info(prediction))
+  chain.subscribe(prediction => purchaser.evaluate(prediction))
 })
