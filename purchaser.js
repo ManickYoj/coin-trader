@@ -6,10 +6,10 @@ const API_URI = 'https://api.gdax.com'
 
 const EXECUTION_RATE_THRESHOLD = 1.0010
 const MAX_SPEND = {
-  'USD': 0.01,
-  'LTC': 0.0001,
-  'ETH': 0.00001,
-  'BTC': 0.000001,
+  'USD': 0.1,
+  'LTC': 0.001,
+  'ETH': 0.0001,
+  'BTC': 0.00001,
 }
 
 const bunyan = require('bunyan');
@@ -29,8 +29,26 @@ const orderLog = bunyan.createLogger({
   ],
 })
 
+const liveOrderLog = bunyan.createLogger({
+  name: "live-order-log",
+  streams: [
+    {
+      level: 'info',
+      stream: process.stdout
+    },
+    {
+      type: 'rotating-file',
+      path: './logs/live-order-log.log',
+      period: '1d',
+      count: 28,
+    },
+  ],
+})
+
 class Purchaser {
+
   constructor () {
+    this.orderingEnabled = true
     const {
       key,
       secret,
@@ -90,15 +108,26 @@ class Purchaser {
 
     orderLog.info(prediction)
     orderLog.info(buy_params, {'action': 'buy'})
-    orderLog.info(sell_params, {'action': 'sell'})
 
-    // LIVE BUY COMMANDS. HANDLE WITH CAUTION
-    // buy_params.forEach((buy_param) => this.authedClient.buy(buy_param, this.handleOrderResponse)
-    // sell_params.forEach((sell_param) => this.authedClient.sell(sell_param, this.handleOrderResponse)
+    // LIVE ORDERING
+    // For the time being, execute one order only and then switch
+    // capability off until restart. This is a safeguard to check
+    // that everything works before giving program more leeway
+    if (this.orderingEnabled) {
+      this.orderingEnabled = false
+
+      liveOrderLog.info(prediction)
+      liveOrderLog.info(buy_params, {'action': 'buy'})
+      liveOrderLog.info(sell_params, {'action': 'sell'})
+
+      buy_params.forEach((buy_param) => this.authedClient.buy(buy_param, this.handleOrderResponse))
+      sell_params.forEach((sell_param) => this.authedClient.sell(sell_param, this.handleOrderResponse))
+    }
   }
 
   handleOrderResponse(err, resp, data) {
-    orderLog.info(data)
+    if (err) liveOrderLog.err(err)
+    liveOrderLog.info(data)
   }
 
   reverseProductID(product_id) {
