@@ -4,12 +4,12 @@ const api_info = require('./keys.json')
 
 const API_URI = 'https://api.gdax.com'
 
-const EXECUTION_RATE_THRESHOLD = 1.0010
+const EXECUTION_RATE_THRESHOLD = 1.0015
 const MAX_SPEND = {
-  'USD': 0.1,
-  'LTC': 0.001,
-  'ETH': 0.0001,
-  'BTC': 0.00001,
+  'USD': 10.0,
+  'LTC': 0.1,
+  'ETH': 0.01,
+  'BTC': 0.001,
 }
 
 const bunyan = require('bunyan');
